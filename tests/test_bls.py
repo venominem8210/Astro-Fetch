@@ -17,7 +17,7 @@ time = lc.time.value
 flux = lc.flux.value
 
 # Create a grid of trial periods to search over (e.g., from 0.5 days to 20 days)
-periods = np.linspace(0.5, 20.0, 1000)
+periods = np.linspace(0.5, 60.0, 2000)
 
 print("Running BLS search...")
 best_period, best_t0, max_power = box_least_squares_search(time, flux, periods)
