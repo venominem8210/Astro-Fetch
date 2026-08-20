@@ -20,9 +20,18 @@ flux = lc.flux.value
 periods = np.linspace(0.5, 60.0, 2000)
 
 print("Running BLS search...")
-best_period, best_t0, max_power = box_least_squares_search(time, flux, periods)
+best_period, best_t0, max_power, powers = box_least_squares_search(time, flux, periods)
 
 print("BLS Search Complete!")
 print(f"Best Period: {best_period} days")
 print(f"Best Epoch (t0): {best_t0}")
 print(f"Max Power: {max_power}")
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 5))
+plt.plot(periods, powers, color='royalblue', lw=1)
+plt.xlabel("Trial Period (days)")
+plt.ylabel("BLS Power")
+plt.title("Kepler-10 Periodogram Search")
+plt.grid(True, alpha=0.3)
+plt.show()
