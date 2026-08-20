@@ -103,11 +103,3 @@ def box_least_squares_search(
                 best_period = period
                 best_t0 = time[0] + (bin_edges[i] * period)
         return best_period, best_t0, max_power
-
-            
-        
-        
-             
-             
-    
-
