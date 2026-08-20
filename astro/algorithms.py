@@ -46,6 +46,7 @@ def box_least_squares_search(
         best_period = periods[0]
         best_t0 = time[0]
         max_power = -float('inf')
+        powers = []
 
         # Iterate through each trial period
         for period in periods:
@@ -97,9 +98,10 @@ def box_least_squares_search(
 
              # Power metric: deeper transit signal relative to baseline noise
              power = depth * np.sqrt(len(box_vals))
+             powers.append(power)
             
              if power > max_power:
                 max_power = power
                 best_period = period
                 best_t0 = time[0] + (bin_edges[i] * period)
-        return best_period, best_t0, max_power
+        return best_period, best_t0, max_power, np.array(powers)
