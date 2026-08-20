@@ -61,8 +61,8 @@ def box_least_squares_search(
         bin_edges = np.linspace(0.0, 1.0, nbins+1)
         bin_indices = np.digitize(sorted_phases, bin_edges) - 1
 
-        binned_flux = np.zeroes(nbins)
-        binned_counts = np.zeroes(nbins)
+        binned_flux = np.zeros(nbins)
+        binned_counts = np.zeros(nbins)
 
         for i in range (len(sorted_flux)):
              b_idx = bin_indices[i]
