@@ -33,3 +33,81 @@ def detrend_lightcurve(time: np.ndarray, flux: np.ndarray, window_length: int = 
     
     return time, detrended_flux
 
+def box_least_squares_search(
+        time: np.ndarray,
+        flux: np.ndarray,
+        periods: np.ndarray,
+        duration_frac: float = 0.05,
+        nbins: int = 100) -> tuple[float, float, float]:
+        """
+        Performs a raw Box Least Squares (BLS) search over a grid of trial orbital periods
+        to detect periodic transit signals in a light curve.
+        """
+        best_period = periods[0]
+        best_t0 = time[0]
+        max_power = -float('inf')
+
+        # Iterate through each trial period
+        for period in periods:
+        # Phase fold the light curve for the current period
+           phases = ((time-time[0])/period)% 1.0
+
+        # Sort by phase
+        sort_idx = np.argsort(phases)
+        sorted_phases = phases[sort_idx]
+        sorted_flux = flux[sort_idx]
+
+        # Bin the phase-folded light curve to speed up box fitting
+        bin_edges = np.linspace(0.0, 1.0, nbins+1)
+        bin_indices = np.digitize(sorted_phases, bin_edges) - 1
+
+        binned_flux = np.zeroes(nbins)
+        binned_counts = np.zeroes(nbins)
+
+        for i in range (len(sorted_flux)):
+             b_idx = bin_indices[i]
+             if 0<= b_idx < nbins :
+                  binned_flux[b_idx] += sorted_flux[i]
+                  binned_counts[b_idx] += 1
+
+         # Avoid division by zero for empty bins
+        valid_bins = binned_counts > 0
+        valid_bins = binned_counts > 0
+        
+        # Only process if we have enough valid bins (skips the rest of this iteration if not)
+        if np.sum(valid_bins) >= nbins * 0.5:
+            binned_flux[valid_bins] /= binned_counts[valid_bins]
+
+        # Test different box widths (transit durations)
+        transit_bins = max(1, int(nbins * duration_frac))
+
+        for i in range(nbins):
+             # Wrap around box summing for transit duration
+             box_indices = [(i+j) % nbins for j in range(transit_bins)]
+             box_vals = [binned_flux[idx] for idx in box_indices if valid_bins[idx]]
+
+             if len(box_vals) < transit_bins *0.7:
+                  continue
+             
+             # Calculate transit depth power
+             mean_out_of_box = np.mean([binned_flux[idx] for idx in range(nbins) if idx not in box_indices and valid_bins[idx]])
+             mean_in_box = np.mean(box_vals)
+
+             depth = mean_out_of_box - mean_in_box
+
+             # Power metric: deeper transit signal relative to baseline noise
+             power = depth * np.sqrt(len(box_vals))
+            
+             if power > max_power:
+                max_power = power
+                best_period = period
+                best_t0 = time[0] + (bin_edges[i] * period)
+        return best_period, best_t0, max_power
+
+            
+        
+        
+             
+             
+    
+
