@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
@@ -40,6 +41,8 @@ class AnalysisRequest(BaseModel):
     user_prompt: str
 
 @app.get("/")
+async def read_index():
+    return FileResponse(os.path.join(os.path.dirname(__file__),"index_html"))
 def read_root():
     return {"status": "online", "message": "JWST Exoplanet Backend is running smoothly!"}
 
