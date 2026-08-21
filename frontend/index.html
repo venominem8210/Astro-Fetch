@@ -120,7 +120,7 @@
             container.innerHTML = `<p class="text-blue-400 animate-pulse">Running Box Least Squares pipeline for ${target}...</p>`;
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/analyze/${encodeURIComponent(target)}`);
+                const response = await fetch(`http://127.0.0.1:8000/api/lightcurve/${encodeURIComponent(target)}`);
                 const data = await response.json();
 
                 if (response.ok) {
