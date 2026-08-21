@@ -192,7 +192,7 @@
             document.getElementById('metric-status').innerText = "Scanning...";
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/lightcurve/${encodeURIComponent(target)}`);
+                const response = await fetch(`/api/lightcurve/${encodeURIComponent(target)}`);
                 if (!response.ok) throw new Error(`Server returned status ${response.status}`);
 
                 currentTargetData = await response.json();
