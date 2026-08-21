@@ -5,142 +5,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VOYAGER-X // Exoplanet Hunter</title>
-    <!-- Google Font: Orbitron -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS for rapid, gorgeous styling -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        orbitron: ['Orbitron', 'sans-serif'],
-                    },
-                    colors: {
-                        spaceBlack: '#0b0f19',
-                        controlPanel: '#111827',
-                        nasaBlue: '#0b3d91',
-                        nasaRed: '#fc3d21',
-                        telemetryGreen: '#10b981',
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Chart.js CDN for Light Curve Plotting -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-spaceBlack text-gray-100 min-h-screen font-mono flex flex-col">
+<body class="bg-slate-950 text-slate-100 font-mono min-h-screen flex flex-col">
 
-    <!-- Header / Mission Banner -->
-    <header class="bg-controlPanel border-b border-gray-800 px-6 py-4 flex justify-between items-center shadow-lg">
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-            <div class="h-3 w-3 bg-nasaRed rounded-full animate-pulse"></div>
-            <h1 class="text-xl font-bold tracking-wider text-white">VOYAGER-X <span
-                    class="text-nasaBlue text-sm bg-blue-900/40 px-2 py-0.5 rounded border border-blue-700/50">EXOPLANET
-                    HUNTER</span></h1>
+            <span class="text-xl font-bold tracking-wider text-blue-400">VOYAGER-X</span>
+            <span
+                class="text-xs uppercase bg-blue-950 text-blue-300 px-2 py-0.5 rounded border border-blue-800">Exoplanet
+                Hunter</span>
         </div>
-        <div class="text-xs text-gray-400 flex items-center space-x-4">
-            <span>BRIDGE: <strong class="text-telemetryGreen">ONLINE</strong></span>
-            <span id="utc-clock">UTC 00:00:00</span>
+        <div class="flex items-center space-x-6 text-xs text-slate-400">
+            <div>BRIDGE: <span id="bridge-status" class="text-emerald-400 font-bold">ONLINE</span></div>
+            <div>UTC <span id="utc-clock">00:00:00</span></div>
         </div>
     </header>
 
-    <!-- Main Control Grid -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Dashboard Grid -->
+    <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
 
-        <!-- Left Panel: Target Input & Controls -->
-        <section class="bg-controlPanel border border-gray-800 rounded-lg p-6 shadow-xl flex flex-col justify-between">
-            <div>
-                <h2 class="text-lg font-semibold mb-4 text-blue-400 border-b border-gray-800 pb-2">Target Acquisition
-                </h2>
+        <!-- Left Column: Controls & Telemetry Log -->
+        <div class="space-y-6 flex flex-col">
+            <!-- Target Acquisition Card -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl">
+                <h2
+                    class="text-sm uppercase tracking-wider text-blue-400 font-bold mb-4 border-b border-slate-800 pb-2">
+                    Target Acquisition</h2>
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Target Name / TIC ID</label>
-                        <input id="targetInput" type="text" placeholder="e.g., TIC 44105959"
-                            class="w-full bg-spaceBlack border border-gray-700 rounded px-3 py-2 text-white focus:outline-none focus:border-nasaBlue">
+                        <label class="block text-xs uppercase text-slate-400 mb-1">Target Name / TIC ID</label>
+                        <input id="target-input" type="text" value="25155310"
+                            class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
                     </div>
-
-                    <button onclick="runAnalysis()"
-                        class="w-full bg-nasaBlue hover:bg-blue-800 text-white font-bold py-2.5 px-4 rounded transition-all duration-200 shadow-md border border-blue-600 tracking-wide flex justify-center items-center space-x-2">
-                        <span>INITIATE BLS SCAN</span>
+                    <button onclick="runScan()"
+                        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded transition tracking-wider text-xs uppercase shadow-lg shadow-blue-900/30">
+                        Initiate BLS Scan
                     </button>
                 </div>
             </div>
 
-            <!-- Status Box -->
-            <div class="mt-6 bg-spaceBlack border border-gray-800 rounded p-4 text-xs">
-                <p class="text-gray-500 uppercase tracking-wider mb-1">Telemetry Log</p>
-                <div id="logOutput" class="text-gray-300 font-mono h-24 overflow-y-auto">System armed. Awaiting target
-                    parameters...</div>
+            <!-- Telemetry Log Card -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex-1 flex flex-col">
+                <h2 class="text-sm uppercase tracking-wider text-slate-400 font-bold mb-3">Telemetry Log</h2>
+                <div id="telemetry-log"
+                    class="bg-slate-950 border border-slate-900 rounded p-3 text-xs text-slate-300 font-mono flex-1 min-h-[160px] max-h-[220px] overflow-y-auto space-y-1">
+                    <div>System armed. Awaiting target parameters...</div>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Right Panel: Telemetry & Results Display -->
-        <section class="lg:col-span-2 bg-controlPanel border border-gray-800 rounded-lg p-6 shadow-xl flex flex-col">
-            <h2 class="text-lg font-semibold mb-4 text-blue-400 border-b border-gray-800 pb-2">Pipeline Output &
-                Telemetry</h2>
+        <!-- Right/Center Column: Visual Analysis & Metrics -->
+        <div class="lg:col-span-2 space-y-6 flex flex-col">
 
-            <div id="resultContainer"
-                class="flex-1 bg-spaceBlack border border-gray-800 rounded p-6 flex flex-col items-center justify-center text-center text-gray-500">
-                <svg class="w-12 h-12 mb-3 text-gray-700 animate-spin" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <p>No active data stream. Run a target scan to populate telemetry metrics.</p>
+            <!-- Metrics Summary Cards -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-4">
+                    <div class="text-xs text-slate-400 uppercase">Data Source</div>
+                    <div id="metric-source" class="text-sm font-bold text-blue-400 mt-1">--</div>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-4">
+                    <div class="text-xs text-slate-400 uppercase">Total Observations</div>
+                    <div id="metric-obs" class="text-sm font-bold text-emerald-400 mt-1">--</div>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-4">
+                    <div class="text-xs text-slate-400 uppercase">Scan Status</div>
+                    <div id="metric-status" class="text-sm font-bold text-slate-300 mt-1">Standby</div>
+                </div>
             </div>
-        </section>
+
+            <!-- Visualization Canvas Card -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex-1 flex flex-col">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
+                    <h2 class="text-sm uppercase tracking-wider text-blue-400 font-bold">Pipeline Output & Light Curve
+                        Analysis</h2>
+                    <span id="target-badge" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Target:
+                        None</span>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="relative flex-1 w-full min-h-[320px]">
+                    <canvas id="lightCurveChart"></canvas>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <!-- JavaScript Bridge Connection -->
+    <!-- JavaScript Logic -->
     <script>
-        // Live UTC Clock
+        // UTC Clock
         setInterval(() => {
             const now = new Date();
-            document.getElementById('utc-clock').innerText = `UTC ${now.toISOString().substring(11, 19)}`;
+            document.getElementById('utc-clock').innerText = now.toUTCString().split(' ')[4];
         }, 1000);
 
+        let myChart = null;
+
         function logMessage(msg) {
-            const log = document.getElementById('logOutput');
-            log.innerHTML += `<div>> ${msg}</div>`;
-            log.scrollTop = log.scrollHeight;
+            const logBox = document.getElementById('telemetry-log');
+            logBox.innerHTML += `<div>> ${msg}</div>`;
+            logBox.scrollTop = logBox.scrollHeight;
         }
 
-        async function runAnalysis() {
-            const target = document.getElementById('targetInput').value.trim();
-            const container = document.getElementById('resultContainer');
-
+        async function runScan() {
+            const target = document.getElementById('target-input').value.trim();
             if (!target) {
                 logMessage("ERROR: Target field cannot be empty.");
                 return;
             }
 
             logMessage(`Transmitting request for target: ${target}...`);
-            container.innerHTML = `<p class="text-blue-400 animate-pulse">Running Box Least Squares pipeline for ${target}...</p>`;
+            document.getElementById('metric-status').innerText = "Scanning...";
 
             try {
                 const response = await fetch(`http://127.0.0.1:8000/api/lightcurve/${encodeURIComponent(target)}`);
-                const data = await response.json();
+                if (!response.ok) throw new Error(`Server returned status ${response.status}`);
 
-                if (response.ok) {
-                    logMessage(`Success! Received telemetry for ${target}.`);
-                    container.innerHTML = `
-                        <div class="text-left w-full space-y-4">
-                            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                                <span class="text-telemetryGreen font-bold">[STATUS: SUCCESS]</span>
-                                <span class="text-gray-400 text-xs">Target: ${data.target}</span>
-                            </div>
-                            <pre class="bg-controlPanel p-4 rounded text-xs text-green-400 overflow-x-auto border border-gray-800">${JSON.stringify(data, null, 2)}</pre>
-                        </div>
-                    `;
-                } else {
-                    throw new Error(data.detail || "Unknown server error");
-                }
+                const data = await response.json();
+                logMessage(`Success! Received telemetry for ${target}.`);
+
+                // Update Summary Cards
+                document.getElementById('metric-source').innerText = data.source || "Unknown";
+                document.getElementById('metric-obs').innerText = data.total_observations || data.time?.length || 0;
+                document.getElementById('metric-status').innerText = "SUCCESS";
+                document.getElementById('target-badge').innerText = `Target: ${data.target}`;
+
+                // Render Chart
+                renderChart(data.time, data.flux);
+
             } catch (err) {
                 logMessage(`CRITICAL ERROR: ${err.message}`);
-                container.innerHTML = `<p class="text-nasaRed">Connection failed: Ensure FastAPI backend is running.</p>`;
+                document.getElementById('metric-status').innerText = "FAILED";
             }
+        }
+
+        function renderChart(timeData, fluxData) {
+            const ctx = document.getElementById('lightCurveChart').getContext('2d');
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeData,
+                    datasets: [{
+                        label: 'Normalized Flux',
+                        data: fluxData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#3b82f6',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'monospace' } } }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#64748b', font: { family: 'monospace' } },
+                            title: { display: true, text: 'Time (BJD)', color: '#64748b' }
+                        },
+                        y: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#64748b', font: { family: 'monospace' } },
+                            title: { display: true, text: 'Relative Flux', color: '#64748b' }
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
