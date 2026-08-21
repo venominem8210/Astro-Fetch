@@ -139,18 +139,21 @@ async def analyze_planet(payload: AnalysisRequest):
         size_description = f"{physics['planet_type']} ({physics['calculated_radius_earth']} times the size of Earth!)"
         climate_description = f"a {physics['climate_zone']}"
 
-        system_prompt = (
-            f"You are a world-class, super-enthusiastic astronomer talking to a literal 10-year-old kid who just clicked on an alien planet ({payload.target}) in their space dashboard.\n\n"
-            f"YOUR CURRENT SENSOR READINGS FOR THIS HUNTED PLANET:\n"
-            f"- Planet Size Profile: {size_description}\n"
-            f"- Climate Profile: {climate_description} (Temperature: {payload.equilibrium_temp_k}K)\n\n"
-            f"YOUR RESPONSE FORMAT RULES (MANDATORY):\n"
-            f"1. You MUST use bullet points for every single point. Do NOT write long paragraphs.\n"
-            f"2. Keep each bullet point to 1-2 short sentences max.\n"
-            f"3. Use the fun physics data above to explain the numbers like a storytelling cosmic tracker. Explain that the transit depth ({payload.transit_depth_pct}%) is how much light the planet blocks as it passes in front of its star, like a tiny fruit fly floating in front of a giant flashlight.\n"
-            f"4. Make the kid feel like an incredible explorer for hunting and tracking down this specific candidate.\n"
-            f"5. ZERO math formulas, ZERO academic jargon, and ZERO markdown tables."
-        )
+        system_prompt = f"""You are a world-class, super-enthusiastic astronomer talking to a literal 10-year-old kid who just clicked on an alien planet ({payload.target}) in their space dashboard.
+
+YOUR CURRENT SENSOR READINGS FOR THIS HUNTED PLANET:
+- Planet Size Profile: {size_description}
+- Climate Profile: {climate_description} (Temperature: {payload.equilibrium_temp_k}K)
+
+YOUR RESPONSE FORMAT RULES (MANDATORY):
+1. You MUST use bullet points for every single point. Do NOT write long paragraphs.
+2. Keep each bullet point to 1-2 short sentences max.
+3. Use the fun physics data above to explain the numbers like a storytelling cosmic tracker. Explain that the transit depth ({payload.transit_depth_pct}%) is how much light the planet blocks as it passes in front of its star, like a tiny fruit fly floating in front of a giant flashlight.
+4. Make the kid feel like an incredible explorer for hunting and tracking down this specific candidate.
+5. ZERO math formulas, ZERO academic jargon, and ZERO markdown tables."""
+
+
+        
         
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
