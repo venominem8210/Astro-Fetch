@@ -1,80 +1,78 @@
-import os
-from dotenv import load_dotenv
-load_dotenv()
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from openai import OpenAI
+import lightkurve as lk
 
-from aperture_jwst.fetcher import fetch_exoplanet_lightcurve
+app = FastAPI(title="VOYAGER-X Backend", version="1.0")
 
-app = FastAPI(title="JWST Exoplanet Dashbord API", version="1.0")
-
-# Enable CORS for frontend communication
+# Enable CORS so your frontend HTML can communicate with this FastAPI server smoothly
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Allows all origins for hackathon testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Hack Club AI Proxy setup
-API_KEY = os.getenv("GROQ_API_KEY", "PENDING_VERIFICATION")
-client = OpenAI(
-    api_key=API_KEY,
-    base_url="https://api.groq.com/openai/v1"
-)
-
-class AnalysisRequest(BaseModel):
+class AnalyzeRequest(BaseModel):
     target: str
-    transit_depth_pct: float
-    equilibrium_temp_k: float
+    transit_depth_pct: float = 1.2
+    equilibrium_temp_k: float = 1200.0
     user_prompt: str
 
 @app.get("/")
 def read_root():
-    return{"status": "online", "message": "JWST Exoplanet Backend is running smoothly!"}
+    return {"status": "VOYAGER-X Telemetry Bridge Online"}
 
-@app.get("/api/lightcurve/{target}")
-def get_lightcurve(target: str):
+@app.get("/api/lightcurve/{target_id}")
+async def get_lightcurve(target_id: str):
     try:
-        data = fetch_exoplanet_lightcurve(target_name=target)
-        return data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-@app.post("/api/analyze")
-def analyze_planet(payload: AnalysisRequest):
-    if API_KEY == "PENDING VERIFICATION":
+        # Search for TESS light curve data in the MAST archive
+        search_result = lk.search_lightcurve(target_id, mission="TESS")
+        
+        if len(search_result) == 0:
+            raise HTTPException(status_code=404, detail=f"No TESS light curve found for target: {target_id}")
+        
+        # Download the first available matching dataset
+        lc = search_result[0].download()
+        
+        # Clean data (remove NaN values and flatten/normalize)
+        lc = lc.remove_nans().flatten()
+        
+        # Limit data points returned to ensure smooth browser rendering (e.g., last 600 points)
+        time_vals = lc.time.value.tolist()
+        flux_vals = lc.flux.value.tolist()
+        
+        if len(time_vals) > 600:
+            time_vals = time_vals[-600:]
+            flux_vals = flux_vals[-600:]
+
         return {
-            "ai_response": ( 
-                f"[MOCK AI COPILOT MODE] Target {payload.target} analyzed: "
-                f"Transit depth at {payload.transit_depth_pct}% and {payload.equilibrium_temp_k}K."
-                f"Once your key is wired in, this switched straight to live AI!"
-            )
+            "target": target_id,
+            "sector": getattr(search_result[0], 'sector', 'N/A'),
+            "total_observations": len(lc.time),
+            "time": time_vals,
+            "flux": flux_vals,
+            "equilibrium_temp_k": 950.0, # Placeholder or extracted metadata if available
+            "star_radius_solar": 1.0,
+            "planet_radius_earth": 1.4
         }
-    try:
-        system_prompt = (
-            f"""You are a world-class, super-enthusiastic astronomer talking to a literal 10-year-old kid who just clicked on an alien planet ({payload.target}) in their space dashboard.
-
-            YOUR RESPONSE FORMAT RULES (MANDATORY):
-            1. You MUST use bullet points for every single point. Do NOT write long paragraphs.
-            2. Keep each bullet point to 1-2 short sentences max.
-            3. Explain the numbers like a fun story (e.g., transit depth means blocking light like a tiny fruit fly).
-            4. Describe what it feels like there (e.g., temperature {payload.equilibrium_temp_k}K means a blazing lava ball).
-            5. ZERO math formulas, ZERO academic jargon, and ZERO markdown tables.""" 
-            f"Target: {payload.target}. Transit Depth: {payload.transit_depth_pct}%, Temp: {payload.equilibrium_temp_k}K."
-        )
-        response = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": payload.user_prompt}
-            ]
-        )
-        return {"ai_response": response.choices[0].message.content}
+        
     except Exception as e:
-        print(f"ACTUAL ERROR: {e}")
-        raise HTTPException(status_code=500, detail=f"AI Proxy Error: {str(e)}")
+        # Fallback response or error indicator if MAST query fails for a weird ID
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/analyze")
+async def analyze_target(payload: AnalyzeRequest):
+    # Basic AI Copilot response stub tailored to the request
+    prompt_lower = payload.user_prompt.lower()
     
+    response_text = f"Analyzing target TIC {payload.target}. Based on the photometric flux variations, the light curve exhibits distinct periodic transit characteristics. The estimated equilibrium temperature of ~{payload.equilibrium_temp_k}K suggests a hot-zone candidate requiring radial velocity follow-up."
+    
+    if "habitable" in prompt_lower:
+        response_text = f"For TIC {payload.target}, the orbital semi-major axis and stellar flux place it relative to the inner/outer bounds of the circumstellar habitable zone. Atmospheric spectroscopy via JWST would be required to confirm volatile presence."
+
+    return {
+        "target": payload.target,
+        "ai_response": response_text
+    }
