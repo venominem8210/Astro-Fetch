@@ -15,7 +15,7 @@
 
     <!-- Top Navigation Bar -->
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="showHome()">
             <span class="text-xl font-bold tracking-wider text-blue-400">VOYAGER-X</span>
             <span
                 class="text-xs uppercase bg-blue-950 text-blue-300 px-2 py-0.5 rounded border border-blue-800">Exoplanet
@@ -27,17 +27,56 @@
         </div>
     </header>
 
-    <!-- Main Dashboard Grid -->
-    <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
+    <!-- VIEW 1: HOME / LANDING PAGE -->
+    <div id="home-view"
+        class="flex-1 flex flex-col justify-center items-center p-6 max-w-4xl mx-auto text-center space-y-8">
+        <div class="space-y-4">
+            <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+                Discover Worlds Beyond Our Solar System.
+            </h1>
+            <p class="text-slate-400 text-sm lg:text-base max-w-2xl mx-auto leading-relaxed">
+                VOYAGER-X is your personal exoplanet hunting mission control. We analyze space telescope telemetry to
+                spot <span class="text-blue-400">transits</span>—tiny, periodic dips in starlight caused by alien
+                planets crossing in front of their host stars.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left w-full my-4">
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-lg">
+                <div class="text-blue-400 font-bold mb-1 text-sm">1. Target Selection</div>
+                <p class="text-xs text-slate-400">Input any TESS Input Catalog (TIC) ID to stream real astronomical
+                    observation data.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-lg">
+                <div class="text-blue-400 font-bold mb-1 text-sm">2. Light Curve Analysis</div>
+                <p class="text-xs text-slate-400">Generate precision graphs mapping brightness over time to reveal
+                    planetary shadows.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-lg">
+                <div class="text-blue-400 font-bold mb-1 text-sm">3. AI Astronomer Copilot</div>
+                <p class="text-xs text-slate-400">Chat live with an AI assistant trained to interpret transit depths and
+                    planetary properties.</p>
+            </div>
+        </div>
+
+        <button onclick="launchDashboard()"
+            class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg transition tracking-wider text-sm uppercase shadow-lg shadow-blue-900/40">
+            Launch Mission Control
+        </button>
+    </div>
+
+    <!-- VIEW 2: ACTIVE MISSION CONTROL DASHBOARD (Hidden by default) -->
+    <main id="dashboard-view" class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full hidden">
 
         <!-- Left Column: Controls & Telemetry Log -->
         <div class="space-y-6 flex flex-col">
             <!-- Target Acquisition Card -->
             <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl">
-                <h2
-                    class="text-sm uppercase tracking-wider text-blue-400 font-bold mb-4 border-b border-slate-800 pb-2">
-                    Target Acquisition</h2>
-
+                <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
+                    <h2 class="text-sm uppercase tracking-wider text-blue-400 font-bold">Target Acquisition</h2>
+                    <button onclick="showHome()" class="text-xs text-slate-500 hover:text-slate-300 underline">Back
+                        Home</button>
+                </div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs uppercase text-slate-400 mb-1">Target Name / TIC ID</label>
@@ -55,13 +94,13 @@
             <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex-1 flex flex-col">
                 <h2 class="text-sm uppercase tracking-wider text-slate-400 font-bold mb-3">Telemetry Log</h2>
                 <div id="telemetry-log"
-                    class="bg-slate-950 border border-slate-900 rounded p-3 text-xs text-slate-300 font-mono flex-1 min-h-[160px] max-h-[220px] overflow-y-auto space-y-1">
-                    <div>System armed. Awaiting target parameters...</div>
+                    class="bg-slate-950 border border-slate-900 rounded p-3 text-xs text-slate-300 font-mono flex-1 min-h-[220px] max-h-[350px] overflow-y-auto space-y-1">
+                    <div>System armed. Ready for scan...</div>
                 </div>
             </div>
         </div>
 
-        <!-- Right/Center Column: Visual Analysis & Metrics -->
+        <!-- Right Column: Visual Analysis, Metrics, & AI Copilot -->
         <div class="lg:col-span-2 space-y-6 flex flex-col">
 
             <!-- Metrics Summary Cards -->
@@ -81,7 +120,7 @@
             </div>
 
             <!-- Visualization Canvas Card -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex-1 flex flex-col">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex flex-col">
                 <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
                     <h2 class="text-sm uppercase tracking-wider text-blue-400 font-bold">Pipeline Output & Light Curve
                         Analysis</h2>
@@ -90,10 +129,26 @@
                 </div>
 
                 <!-- Chart Container -->
-                <div class="relative flex-1 w-full min-h-[320px]">
+                <div class="relative w-full h-[280px]">
                     <canvas id="lightCurveChart"></canvas>
                 </div>
             </div>
+
+            <!-- AI Copilot Chat Card (Positioned on the right, below the chart) -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex flex-col">
+                <h2 class="text-sm uppercase tracking-wider text-purple-400 font-bold mb-3">AI Astronomer Copilot</h2>
+                <div id="ai-chat-log"
+                    class="bg-slate-950 border border-slate-900 rounded p-3 text-xs text-slate-300 font-mono h-32 overflow-y-auto space-y-2 mb-3">
+                    <div class="text-purple-400">[Copilot]: Awaiting scan data to assist with analysis.</div>
+                </div>
+                <div class="flex space-x-2">
+                    <input id="ai-prompt-input" type="text" placeholder="Ask AI about this target..."
+                        class="flex-1 bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
+                    <button onclick="sendAiPrompt()"
+                        class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-4 py-2 rounded text-xs uppercase shadow-lg shadow-purple-900/30">Ask</button>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -106,6 +161,18 @@
         }, 1000);
 
         let myChart = null;
+        let currentTargetData = null;
+
+        function showHome() {
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
+        }
+
+        function launchDashboard() {
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            runScan();
+        }
 
         function logMessage(msg) {
             const logBox = document.getElementById('telemetry-log');
@@ -127,21 +194,54 @@
                 const response = await fetch(`http://127.0.0.1:8000/api/lightcurve/${encodeURIComponent(target)}`);
                 if (!response.ok) throw new Error(`Server returned status ${response.status}`);
 
-                const data = await response.json();
+                currentTargetData = await response.json();
                 logMessage(`Success! Received telemetry for ${target}.`);
 
-                // Update Summary Cards
-                document.getElementById('metric-source').innerText = data.source || "Unknown";
-                document.getElementById('metric-obs').innerText = data.total_observations || data.time?.length || 0;
+                document.getElementById('metric-source').innerText = currentTargetData.source || "Unknown";
+                document.getElementById('metric-obs').innerText = currentTargetData.total_observations || currentTargetData.time?.length || 0;
                 document.getElementById('metric-status').innerText = "SUCCESS";
-                document.getElementById('target-badge').innerText = `Target: ${data.target}`;
+                document.getElementById('target-badge').innerText = `Target: ${currentTargetData.target}`;
 
-                // Render Chart
-                renderChart(data.time, data.flux);
+                renderChart(currentTargetData.time, currentTargetData.flux);
 
             } catch (err) {
                 logMessage(`CRITICAL ERROR: ${err.message}`);
                 document.getElementById('metric-status').innerText = "FAILED";
+            }
+        }
+
+        async function sendAiPrompt() {
+            const promptInput = document.getElementById('ai-prompt-input');
+            const userPrompt = promptInput.value.trim();
+            if (!userPrompt) return;
+
+            const chatLog = document.getElementById('ai-chat-log');
+            chatLog.innerHTML += `<div class="text-slate-300">[You]: ${userPrompt}</div>`;
+            promptInput.value = '';
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            try {
+                const payload = {
+                    target: currentTargetData ? currentTargetData.target : "25155310",
+                    transit_depth_pct: 1.2,
+                    equilibrium_temp_k: 1200.0,
+                    user_prompt: userPrompt
+                };
+
+                const res = await fetch('http://127.0.0.1:8000/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error("Failed to reach AI proxy");
+                const result = await res.json();
+                const aiReply = result.ai_response || result.ai_respomse || "No response generated.";
+
+                chatLog.innerHTML += `<div class="text-purple-400">[Copilot]: ${aiReply}</div>`;
+                chatLog.scrollTop = chatLog.scrollHeight;
+            } catch (err) {
+                chatLog.innerHTML += `<div class="text-red-400">[Error]: Could not fetch AI response.</div>`;
             }
         }
 
