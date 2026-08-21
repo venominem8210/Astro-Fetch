@@ -249,24 +249,24 @@
         }
 
         function renderChart(timeData, fluxData) {
+            if (window.myChart && typeof window.myChart.destroy === 'function') {
+                window.myChart.destroy();
+            }
             const ctx = document.getElementById('lightCurveChart').getContext('2d');
 
-            if (myChart) {
-                myChart.destroy();
-            }
+            // Format data into {x, y} coordinate objects for precise linear X-Y plotting
+            const scatterData = timeData.map((t, i) => ({ x: t, y: fluxData[i] }));
 
-            myChart = new Chart(ctx, {
+            window.myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: timeData,
                     datasets: [{
                         label: 'Normalized Flux',
-                        data: fluxData,
+                        data: scatterData,
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        pointBackgroundColor: '#3b82f6',
+                        borderWidth: 1.5,
+                        pointRadius: 2, // Hides dots for a clean continuous line; change to 2 if you want dots back
                         fill: true,
                         tension: 0.1
                     }]
@@ -279,19 +279,19 @@
                     },
                     scales: {
                         x: {
+                            type: 'linear', // Forces Chart.js to treat X as a continuous numerical axis
                             grid: { color: '#1e293b' },
-                            ticks: { color: '#64748b', font: { family: 'monospace' } },
-                            title: { display: true, text: 'Time (BJD)', color: '#64748b' }
+                            ticks: { color: '#64748b' }
                         },
                         y: {
                             grid: { color: '#1e293b' },
-                            ticks: { color: '#64748b', font: { family: 'monospace' } },
-                            title: { display: true, text: 'Relative Flux', color: '#64748b' }
+                            ticks: { color: '#64748b' }
                         }
                     }
                 }
             });
         }
+
     </script>
 </body>
 
