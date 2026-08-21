@@ -68,5 +68,6 @@ def analyze_planet(payload: AnalysisRequest):
         )
         return {"ai_response": response.choices[0].message.content}
     except Exception as e:
+        print(f"ACTUAL ERROR: {e}")
         raise HTTPException(status_code=500, detail=f"AI Proxy Error: {str(e)}")
     
