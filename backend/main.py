@@ -60,7 +60,7 @@ def analyze_planet(payload: AnalysisRequest):
             f"Target: {payload.target}. Transit Depth: {payload.transit_depth_pct}%, Temp: {payload.equilibrium_temp_k}K."
         )
         response = client.chat.completions.create(
-            model="google/gemini-3.6-flash",
+            model="google/gemini-2.5-flash",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": payload.user_prompt}
