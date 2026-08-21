@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -64,7 +66,7 @@ def analyze_planet(payload: AnalysisRequest):
                 {"role": "user", "content": payload.user_prompt}
             ]
         )
-        return {"ai_respomse": response.choices[0].message.content}
+        return {"ai_response": response.choices[0].message.content}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI Proxy Error: {str(e)}")
     
