@@ -32,7 +32,7 @@ app.add_middleware(
 API_KEY = os.getenv("GROQ_API_KEY", "PENDING VERIFICATION")
 client = OpenAI(
     api_key=API_KEY,
-    base_url="https://api.groq.com/openai/v1"
+    base_url="https://openrouter.ai"
 )
 
 class AnalysisRequest(BaseModel):
@@ -156,7 +156,7 @@ YOUR RESPONSE FORMAT RULES (MANDATORY):
         
         
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": payload.user_prompt}
