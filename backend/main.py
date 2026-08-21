@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
 import lightkurve as lk
+from pathlib import Path
 
 # If you were using a custom fetcher module, keep it imported here, 
 # or use the direct lightkurve fallback shown below.
@@ -42,7 +43,8 @@ class AnalysisRequest(BaseModel):
 
 @app.get("/")
 async def read_index():
-    return FileResponse(os.path.join(os.path.dirname(__file__),"index_html"))
+    index_path = Path(__file__).parent / "index.html"
+    return FileResponse(str(index_path))
 def read_root():
     return {"status": "online", "message": "JWST Exoplanet Backend is running smoothly!"}
 
