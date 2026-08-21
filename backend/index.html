@@ -156,6 +156,9 @@
 
     <!-- JavaScript Logic -->
     <script>
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://127.0.0.1:8000'
+            : '';
         setInterval(() => {
             const now = new Date();
             document.getElementById('utc-clock').innerText = now.toUTCString().split(' ')[4];
