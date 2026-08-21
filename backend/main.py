@@ -56,11 +56,18 @@ def analyze_planet(payload: AnalysisRequest):
         }
     try:
         system_prompt = (
-            f"You are an expert astronomer A! compilot in a JWST exoplanet dashboard. "
+            f"""You are a world-class, super-enthusiastic astronomer talking to a literal 10-year-old kid who just clicked on an alien planet ({payload.target}) in their space dashboard.
+
+            YOUR RESPONSE FORMAT RULES (MANDATORY):
+            1. You MUST use bullet points for every single point. Do NOT write long paragraphs.
+            2. Keep each bullet point to 1-2 short sentences max.
+            3. Explain the numbers like a fun story (e.g., transit depth means blocking light like a tiny fruit fly).
+            4. Describe what it feels like there (e.g., temperature {payload.equilibrium_temp_k}K means a blazing lava ball).
+            5. ZERO math formulas, ZERO academic jargon, and ZERO markdown tables.""" 
             f"Target: {payload.target}. Transit Depth: {payload.transit_depth_pct}%, Temp: {payload.equilibrium_temp_k}K."
         )
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": payload.user_prompt}

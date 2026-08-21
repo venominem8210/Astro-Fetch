@@ -65,12 +65,12 @@
         </button>
     </div>
 
-    <!-- VIEW 2: ACTIVE MISSION CONTROL DASHBOARD (Hidden by default) -->
-    <main id="dashboard-view" class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full hidden">
+    <!-- VIEW 2: ACTIVE MISSION CONTROL DASHBOARD -->
+    <main id="dashboard-view"
+        class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-[1600px] mx-auto w-full hidden">
 
-        <!-- Left Column: Controls & Telemetry Log -->
-        <div class="space-y-6 flex flex-col">
-            <!-- Target Acquisition Card -->
+        <!-- Column 1: Controls & Telemetry Log -->
+        <div class="space-y-6 flex flex-col lg:col-span-1">
             <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl">
                 <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
                     <h2 class="text-sm uppercase tracking-wider text-blue-400 font-bold">Target Acquisition</h2>
@@ -90,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- Telemetry Log Card -->
             <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex-1 flex flex-col">
                 <h2 class="text-sm uppercase tracking-wider text-slate-400 font-bold mb-3">Telemetry Log</h2>
                 <div id="telemetry-log"
@@ -100,10 +99,8 @@
             </div>
         </div>
 
-        <!-- Right Column: Visual Analysis, Metrics, & AI Copilot -->
+        <!-- Column 2 & 3: Visual Analysis & Metrics -->
         <div class="lg:col-span-2 space-y-6 flex flex-col">
-
-            <!-- Metrics Summary Cards -->
             <div class="grid grid-cols-3 gap-4">
                 <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-4">
                     <div class="text-xs text-slate-400 uppercase">Data Source</div>
@@ -119,42 +116,46 @@
                 </div>
             </div>
 
-            <!-- Visualization Canvas Card -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex flex-col">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex flex-col flex-1">
                 <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
                     <h2 class="text-sm uppercase tracking-wider text-blue-400 font-bold">Pipeline Output & Light Curve
                         Analysis</h2>
                     <span id="target-badge" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Target:
                         None</span>
                 </div>
-
-                <!-- Chart Container -->
-                <div class="relative w-full h-[280px]">
+                <div class="relative w-full flex-1 min-h-[350px]">
                     <canvas id="lightCurveChart"></canvas>
                 </div>
             </div>
+        </div>
 
-            <!-- AI Copilot Chat Card (Positioned on the right, below the chart) -->
-            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex flex-col">
-                <h2 class="text-sm uppercase tracking-wider text-purple-400 font-bold mb-3">AI Astronomer Copilot</h2>
+        <!-- Column 4: Dedicated AI Copilot Side Panel -->
+        <div class="lg:col-span-1 flex flex-col">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-lg p-5 shadow-xl flex flex-col h-full">
+                <h2
+                    class="text-sm uppercase tracking-wider text-purple-400 font-bold mb-3 flex items-center justify-between">
+                    <span>AI Copilot</span>
+                    <span
+                        class="text-[10px] bg-purple-950 text-purple-300 px-1.5 py-0.5 rounded border border-purple-800">Active</span>
+                </h2>
                 <div id="ai-chat-log"
-                    class="bg-slate-950 border border-slate-900 rounded p-3 text-xs text-slate-300 font-mono h-32 overflow-y-auto space-y-2 mb-3">
+                    class="bg-slate-950 border border-slate-900 rounded p-3 text-xs text-slate-300 font-mono flex-1 h-[450px] overflow-y-auto space-y-3 mb-3">
                     <div class="text-purple-400">[Copilot]: Awaiting scan data to assist with analysis.</div>
                 </div>
-                <div class="flex space-x-2">
+                <div class="flex flex-col space-y-2">
                     <input id="ai-prompt-input" type="text" placeholder="Ask AI about this target..."
-                        class="flex-1 bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
+                        class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
                     <button onclick="sendAiPrompt()"
-                        class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-4 py-2 rounded text-xs uppercase shadow-lg shadow-purple-900/30">Ask</button>
+                        class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold px-4 py-2 rounded text-xs uppercase shadow-lg shadow-purple-900/30">Ask
+                        AI Copilot</button>
                 </div>
             </div>
-
         </div>
+
     </main>
 
     <!-- JavaScript Logic -->
     <script>
-        // UTC Clock
         setInterval(() => {
             const now = new Date();
             document.getElementById('utc-clock').innerText = now.toUTCString().split(' ')[4];
@@ -216,7 +217,7 @@
             if (!userPrompt) return;
 
             const chatLog = document.getElementById('ai-chat-log');
-            chatLog.innerHTML += `<div class="text-slate-300">[You]: ${userPrompt}</div>`;
+            chatLog.innerHTML += `<div class="text-slate-300 pt-2 border-t border-slate-900">[You]: ${userPrompt}</div>`;
             promptInput.value = '';
             chatLog.scrollTop = chatLog.scrollHeight;
 
@@ -238,10 +239,12 @@
                 const result = await res.json();
                 const aiReply = result.ai_response || result.ai_respomse || "No response generated.";
 
-                chatLog.innerHTML += `<div class="text-purple-400">[Copilot]: ${aiReply}</div>`;
+                const formattedReply = aiReply.replace(/\n/g, '<br>');
+
+                chatLog.innerHTML += `<div class="text-purple-400 pt-1">[Copilot]:<br>${formattedReply}</div>`;
                 chatLog.scrollTop = chatLog.scrollHeight;
             } catch (err) {
-                chatLog.innerHTML += `<div class="text-red-400">[Error]: Could not fetch AI response.</div>`;
+                chatLog.innerHTML += `<div class="text-red-400 pt-1">[Error]: Could not fetch AI response.</div>`;
             }
         }
 
