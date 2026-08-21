@@ -20,10 +20,10 @@ app.add_middleware(
 )
 
 # Hack Club AI Proxy setup
-API_KEY = os.getenv("HACK_CLUB_API_KEY", "PENDING_VERIFICATION")
+API_KEY = os.getenv("GROQ_API_KEY", "PENDING_VERIFICATION")
 client = OpenAI(
     api_key=API_KEY,
-    base_url="https://ai.hackclub.com/proxy/v1"
+    base_url="https://api.groq.com/openai/v1"
 )
 
 class AnalysisRequest(BaseModel):
@@ -60,7 +60,7 @@ def analyze_planet(payload: AnalysisRequest):
             f"Target: {payload.target}. Transit Depth: {payload.transit_depth_pct}%, Temp: {payload.equilibrium_temp_k}K."
         )
         response = client.chat.completions.create(
-            model="google/gemini-2.5-flash",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": payload.user_prompt}
