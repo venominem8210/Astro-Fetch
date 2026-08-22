@@ -261,7 +261,7 @@
 
                 // Fetch with timeout (5 second limit)
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
 
                 const res = await fetch('/api/analyze', {
                     method: 'POST',
