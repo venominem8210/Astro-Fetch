@@ -27,7 +27,7 @@
 ## 🌐 Quick Start (For Reviewers)
 
 1. Open the live deployment link in your browser.
-2. Select a star TIC ID to fetch its live JWST spectrum profiles.
+2. Type in a star TIC ID to fetch its live JWST spectrum profiles.
 3. Hover over the graphs to read telemetry values.
 4. Open the **AI COPILOT** chat window to consult your AI space assistant for data analyzing.
 
