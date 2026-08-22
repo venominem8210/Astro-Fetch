@@ -32,17 +32,4 @@
 4. Open the **Team Radio** chat window to consult your AI space assistant.
 
 
-## 📂 Project Structure
-
-```text
-Astro-Fetch/
-│
-├── aperture_jwst/          # JWST aperture and data fetching module
-│   ├── fetcher.py          # Handles data retrieval routines
-│   └── .gitignore
-│
-├── astro/                  # Core astronomy and calculation algorithms
-│   └── algorithms.py       # Math and pipeline computation logic
-│
-├── main.py                 # Main execution entry point
-└── README.md
+I used Google Gemini 3.1 Pro Extended to design the code(both frontend and backend) and Claude Code(Sonnet 5 Extended) to identify bugs and errors for 90% of the project. 
