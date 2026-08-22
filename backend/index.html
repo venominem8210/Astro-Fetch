@@ -218,43 +218,121 @@
         async function sendAiPrompt() {
             const promptInput = document.getElementById('ai-prompt-input');
             const userPrompt = promptInput.value.trim();
-            if (!userPrompt) return;
+            const sendButton = document.getElementById('send-button'); // Make sure your button has this ID
 
-            const chatLog = document.getElementById('ai-chat-log');
-            chatLog.innerHTML += `<div class="text-slate-300 pt-2 border-t border-slate-900">[You]: ${userPrompt}</div>`;
+            // Validation
+            if (!userPrompt) {
+                alert('Please enter a prompt before sending');
+                return;
+            }
+
+            // Disable input and button to prevent duplicate requests
+            promptInput.disabled = true;
+            sendButton.disabled = true;
+            sendButton.textContent = 'Thinking...';
+
+            const chatlog = document.getElementById('ai-chat-log');
+
+            // Add user message to chat (escaped to prevent XSS)
+            const userDiv = document.createElement('div');
+            userDiv.className = 'text-slate-300 pt-2 border-slate-900';
+            userDiv.textContent = `[You]: ${userPrompt}`;
+            chatlog.appendChild(userDiv);
+
             promptInput.value = '';
-            chatLog.scrollTop = chatLog.scrollHeight;
+            chatlog.scrollTop = chatlog.scrollHeight;
 
             try {
+                // Build payload with proper null checks
+                const currentTargetData = targetData || {};
                 const payload = {
-                    target: currentTargetData ? currentTargetData.target : "25155310",
-                    transit_depth_pct: currentTargetData && currentTargetData.transit_depth_pct !== undefined
+                    target: currentTargetData.target || "25155310",
+                    transit_depth_pct: (currentTargetData.transit_depth_pct !== undefined && currentTargetData.transit_depth_pct !== null)
                         ? currentTargetData.transit_depth_pct
-                        : 1.2, // Falls back to default if not returned by scan
-                    equilibrium_temp_k: currentTargetData && currentTargetData.equilibrium_temp_k !== undefined
+                        : 1.2, // Fallback to default
+                    equilibrium_temp_k: (currentTargetData.equilibrium_temp_k !== undefined && currentTargetData.equilibrium_temp_k !== null)
                         ? currentTargetData.equilibrium_temp_k
-                        : 950.0, // Dynamically maps out whatever temperature is scanned!
+                        : 950.0, // Dynamically maps out whatever temperature is scanned
                     user_prompt: userPrompt
                 };
+
+                // Fetch with timeout (5 second limit)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
 
                 const res = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
                 });
 
-                if (!res.ok) throw new Error("Failed to reach AI proxy");
+                clearTimeout(timeoutId);
+
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    throw new Error(`Server error (${res.status}): ${errorText}`);
+                }
+
                 const result = await res.json();
-                const aiReply = result.ai_response || result.ai_respomse || "No response generated.";
 
-                const formattedReply = aiReply.replace(/\n/g, '<br>');
+                // Properly check for response (fixed duplicate field check)
+                const aiReply = result.ai_response || "No response generated.";
 
-                chatLog.innerHTML += `<div class="text-purple-400 pt-1">[Copilot]:<br>${formattedReply}</div>`;
-                chatLog.scrollTop = chatLog.scrollHeight;
-            } catch (err) {
-                chatLog.innerHTML += `<div class="text-red-400 pt-1">[Error]: Could not fetch AI response.</div>`;
+                // Escape HTML and convert newlines to <br> safely
+                const escapedReply = escapeHtml(aiReply);
+                const formattedReply = escapedReply.replace(/\n/g, '<br>');
+
+                // Add AI response to chat
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'text-purple-400 pt-1';
+                aiDiv.innerHTML = `[Copilot]:<br>${formattedReply}`;
+                chatlog.appendChild(aiDiv);
+
+                chatlog.scrollTop = chatlog.scrollHeight;
+            }
+            catch (err) {
+                let errorMessage = "Could not fetch AI response.";
+
+                if (err.name === 'AbortError') {
+                    errorMessage = "Request timed out. The API took too long to respond. Try again.";
+                } else if (err.message.includes('Failed to fetch')) {
+                    errorMessage = "Network error: Could not reach the server. Check your connection.";
+                } else if (err.message) {
+                    errorMessage = `Error: ${err.message}`;
+                }
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-red-400 pt-1';
+                errorDiv.textContent = `[Error]: ${errorMessage}`;
+                chatlog.appendChild(errorDiv);
+
+                chatlog.scrollTop = chatlog.scrollHeight;
+                console.error('Fetch error:', err);
+            }
+            finally {
+                // Re-enable input and button
+                promptInput.disabled = false;
+                sendButton.disabled = false;
+                sendButton.textContent = 'Send';
+                promptInput.focus();
             }
         }
+
+        // Helper function to escape HTML and prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Optional: Add enter key support
+        document.getElementById('ai-prompt-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendAiPrompt();
+            }
+        });
 
         function renderChart(timeData, fluxData) {
             if (window.myChart && typeof window.myChart.destroy === 'function') {

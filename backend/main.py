@@ -124,21 +124,36 @@ async def get_lightcurve(target_id: str):
 
 @app.post("/api/analyze")
 async def analyze_planet(payload: AnalysisRequest):
+    # Check API key
     if API_KEY == "PENDING VERIFICATION":
         return {
-            "ai_response": (
-                f"[MOCK AI COPILOT MODE] Target {payload.target} analyzed: "
-                f"Transit depth at {payload.transit_depth_pct}% and {payload.equilibrium_temp_k}K. "
-                f"Once your key is wired in, this switches straight to live AI!"
-            )
+            "ai_response": "[MOCK AI COPILOT MODE] Target {payload.target} analyzed: Transit depth at {payload.transit_depth_pct}% and {payload.equilibrium_temp_k}K. Once your key is wired in, this switches straight to live AI!"
         }
+    
     try:
-        # Run the math engine using parameters sent from your dashboard
-        physics = calculate_planetary_physics(payload.transit_depth_pct, payload.equilibrium_temp_k)
+        # Input validation
+        if not payload or not payload.target:
+            raise ValueError("Missing required field: target")
         
-        size_description = f"{physics['planet_type']} ({physics['calculated_radius_earth']} times the size of Earth!)"
-        climate_description = f"a {physics['climate_zone']}"
-
+        if payload.transit_depth_pct is None or payload.equilibrium_temp_k is None:
+            raise ValueError("Missing required fields: transit_depth_pct or equilibrium_temp_k")
+        
+        # Validate numeric ranges
+        if not (0 <= payload.transit_depth_pct <= 100):
+            raise ValueError("transit_depth_pct must be between 0 and 100")
+        
+        if payload.equilibrium_temp_k < 0:
+            raise ValueError("equilibrium_temp_k cannot be negative")
+        
+        # Run the math engine using parameters sent from your dashboard
+        physics = calculate_planetary_physics(
+            payload.transit_depth_pct, 
+            payload.equilibrium_temp_k
+        )
+        
+        size_description = f"{physics['planet_type']} ({physics['calculated_radius_earth']} times the size of Earth)"
+        climate_description = f"{physics['climate_zone']}"
+        
         system_prompt = f"""You are a world-class, super-enthusiastic astronomer talking to a literal 10-year-old kid who just clicked on an alien planet ({payload.target}) in their space dashboard.
 
 YOUR CURRENT SENSOR READINGS FOR THIS HUNTED PLANET:
@@ -148,12 +163,9 @@ YOUR CURRENT SENSOR READINGS FOR THIS HUNTED PLANET:
 YOUR RESPONSE FORMAT RULES (MANDATORY):
 1. You MUST use bullet points for every single point. Do NOT write long paragraphs.
 2. Keep each bullet point to 1-2 short sentences max.
-3. Use the fun physics data above to explain the numbers like a storytelling cosmic tracker. Explain that the transit depth ({payload.transit_depth_pct}%) is how much light the planet blocks as it passes in front of its star, like a tiny fruit fly floating in front of a giant flashlight.
+3. Use the fun physics data above to explain the numbers like a storytelling cosmic tracker. Explain that the transit depth ({payload.transit_depth_pct}%) is how much light the planet blocks as it passes in front of its star, like a tiny fly floating in front of a giant flashlight.
 4. Make the kid feel like an incredible explorer for hunting and tracking down this specific candidate.
 5. ZERO math formulas, ZERO academic jargon, and ZERO markdown tables."""
-
-
-        
         
         response = client.chat.completions.create(
             model="openai/gpt-oss-20b",
@@ -162,7 +174,16 @@ YOUR RESPONSE FORMAT RULES (MANDATORY):
                 {"role": "user", "content": payload.user_prompt}
             ]
         )
+        
         return {"ai_response": response.choices[0].message.content}
+    
+    except ValueError as ve:
+        print(f"VALIDATION ERROR: {ve}")
+        raise HTTPException(status_code=400, detail=f"Invalid input: {str(ve)}")
+    
     except Exception as e:
         print(f"ACTUAL ERROR: {e}")
-        raise HTTPException(status_code=500, detail=f"AI Proxy Error: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"AI Proxy Error: {str(e)}"
+        )
