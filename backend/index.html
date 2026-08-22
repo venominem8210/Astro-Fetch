@@ -214,7 +214,11 @@
                 document.getElementById('metric-status').innerText = "FAILED";
             }
         }
-
+        let targetData = {
+            target: "25155310",
+            transit_depth_pct: 1.2,
+            equilibrium_temp_k: 950.0
+        };
         let isRequestInFlight = false;
 
         async function sendAiPrompt() {
