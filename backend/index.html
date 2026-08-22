@@ -200,6 +200,7 @@
                 if (!response.ok) throw new Error(`Server returned status ${response.status}`);
 
                 currentTargetData = await response.json();
+                currentTargetData = result;
                 logMessage(`Success! Received telemetry for ${target}.`);
 
                 document.getElementById('metric-source').innerText = currentTargetData.source || "Unknown";
