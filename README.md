@@ -12,7 +12,7 @@
 
 ### 🤖 AI Astrophysicist Chatbot
 * **Context-Aware Assistance:** The built-in AI chatbot acts like an expert astronomer. It dynamically reads the current planet's data so it knows exactly what you are looking at.
-* **Instant Explanations:** Click the suggested prompt chips or type your own questions to understand what the transmission spectra dips mean (e.g., *"Is there methane here?"*).
+* **Instant Explanations:** Type your own questions to understand what the transmission spectra dips mean (e.g., *"How hot is the exoplanet??"*).
 
 ---
 
