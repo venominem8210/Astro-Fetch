@@ -166,7 +166,7 @@ YOUR RESPONSE FORMAT RULES (MANDATORY):
 5. ZERO math formulas, ZERO academic jargon, and ZERO markdown tables."""
         
         response = client.chat.completions.create(
-            model="mixtral-8x7b-32768",
+            model="gpt-oss-20b",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": payload.user_prompt}
