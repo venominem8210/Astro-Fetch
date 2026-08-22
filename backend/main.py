@@ -7,7 +7,6 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
-import lightkurve as lk
 from pathlib import Path
 
 # If you were using a custom fetcher module, keep it imported here, 
@@ -88,6 +87,7 @@ def read_root():
 
 @app.get("/api/lightcurve/{target_id}")
 async def get_lightcurve(target_id: str):
+    import lightkurve as lk
     try:
         if fetch_exoplanet_lightcurve:
             data = fetch_exoplanet_lightcurve(target_name=target_id)
