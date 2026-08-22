@@ -127,7 +127,7 @@ async def analyze_planet(payload: AnalysisRequest):
         
         client = OpenAI(
         api_key=API_KEY,
-        base_url="https://openrouter.ai"
+        base_url="https://api.groq.com/openai/v1"
 )
         # Input validation
         if not payload or not payload.target:
@@ -166,7 +166,7 @@ YOUR RESPONSE FORMAT RULES (MANDATORY):
 5. ZERO math formulas, ZERO academic jargon, and ZERO markdown tables."""
         
         response = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="mixtral-8x7b-32768",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": payload.user_prompt}
