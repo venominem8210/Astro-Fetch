@@ -215,6 +215,8 @@
             }
         }
 
+        let isRequestInFlight = false;
+
         async function sendAiPrompt() {
             const promptInput = document.getElementById('ai-prompt-input');
             const userPrompt = promptInput.value.trim();
@@ -225,11 +227,8 @@
                 alert('Please enter a prompt before sending');
                 return;
             }
-
-            // Disable input and button to prevent duplicate requests
-            promptInput.disabled = true;
-            sendButton.disabled = true;
-            sendButton.textContent = 'Thinking...';
+            if (isRequestInFlight) return;
+            isRequestInFlight = true;
 
             const chatlog = document.getElementById('ai-chat-log');
 
@@ -311,11 +310,7 @@
                 console.error('Fetch error:', err);
             }
             finally {
-                // Re-enable input and button
-                promptInput.disabled = false;
-                sendButton.disabled = false;
-                sendButton.textContent = 'Send';
-                promptInput.focus();
+                isRequestInFlight = false;
             }
         }
 
