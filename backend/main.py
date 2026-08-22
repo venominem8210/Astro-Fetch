@@ -26,14 +26,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Groq AI Proxy setup using OpenAI SDK client
 API_KEY = os.getenv("GROQ_API_KEY", "PENDING VERIFICATION")
-client = OpenAI(
-    api_key=API_KEY,
-    base_url="https://openrouter.ai"
-)
-
 class AnalysisRequest(BaseModel):
     target: str
     transit_depth_pct: float = 1.2
@@ -131,6 +124,11 @@ async def analyze_planet(payload: AnalysisRequest):
         }
     
     try:
+        
+        client = OpenAI(
+        api_key=API_KEY,
+        base_url="https://openrouter.ai"
+)
         # Input validation
         if not payload or not payload.target:
             raise ValueError("Missing required field: target")
