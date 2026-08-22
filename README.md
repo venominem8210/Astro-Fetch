@@ -27,9 +27,9 @@
 ## 🌐 Quick Start (For Reviewers)
 
 1. Open the live deployment link in your browser.
-2. Select an exoplanet to fetch its live JWST spectrum profiles.
+2. Select a star TIC ID to fetch its live JWST spectrum profiles.
 3. Hover over the graphs to read telemetry values.
-4. Open the **Team Radio** chat window to consult your AI space assistant.
+4. Open the **AI COPILOT** chat window to consult your AI space assistant for data analyzing.
 
 
 I used Google Gemini 3.1 Pro Extended to design the code(both frontend and backend) and Claude Code(Sonnet 5 Extended) to identify bugs and errors for 90% of the project. 
