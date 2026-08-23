@@ -1,35 +1,43 @@
-# 🌌 Astro-Fetch: Live JWST Exoplanet Analyzer
-
-**Astro-Fetch** is an interactive web platform that hooks directly into NASA's public data archives to analyze atmospheric chemical signatures from the James Webb Space Telescope (JWST). 
-
----
-
-## ⚡ Core Interactive Features
-
-### 📊 Hover-Responsive Light Curves
-* **Precision Tracking:** Move your cursor across any data point on the graph to instantly view exact relative brightness and timing telemetry.
-* **No Raw Text Dumps:** Data points automatically round to clear, readable values with tracking guide crosshairs.
-
-### 🤖 AI Astrophysicist Chatbot
-* **Context-Aware Assistance:** The built-in AI chatbot acts like an expert astronomer. It dynamically reads the current planet's data so it knows exactly what you are looking at.
-* **Instant Explanations:** Type your own questions to understand what the transmission spectra dips mean (e.g., *"How hot is the exoplanet??"*).
-
----
-
-## 🛠️ How It Works Under the Hood
-
-* **`aperture_jwst/`** — Connects directly to NASA's MAST API to pull real-time telescope datasets.
-* **`astro/`** — Cleans and processes raw telescope signal noise into clean planetary atmospheric profiles.
-* **`main.py`** — The engine running your Python data server that feeds data to your responsive Tailwind frontend dashboard.
-
----
-
-## 🌐 Quick Start (For Reviewers)
-
-1. Open the live deployment link in your browser.
-2. Type in a star TIC ID to fetch its live JWST spectrum profiles.
-3. Hover over the graphs to read telemetry values.
-4. Open the **AI COPILOT** chat window to consult your AI space assistant for data analyzing.
+# AstroFetch-Voyager X: TESS Exoplanet Hunter, Star Light Curve Analyzer
 
 
-I used Google Gemini 3.1 Pro Extended to design the code(both frontend and backend) and Claude Code(Sonnet 5 Extended) to identify bugs and errors for 90% of the project. 
+AstroFetch-Voyager X is an exoplanet detection platform that uses star light curve data from the TESS accessed from the MAST API for planet identification and condition assessment
+(temperature, atmosphere content etc.) 
+
+
+# Features
+Features a Light Curve Graph depicting the normalized flux of light from the specified star.
+Uses that data to anaylze and depict a rough model of how the planet and the star compare in size to each other.
+Also consists of real-time metrics - eg. planet radius, distance from Earth, etc.
+Voyager-X features an AI Chatbot as well to explain the planetary characteristics and generates a simple story to make it easier to understand.
+
+# How It Works
+User enters Star TIC ID 
+System fetches TESS lightcurve data
+Displays graph of transit data
+AI then analyzes characteristics
+Shows orbital system visualization with key metrics.
+
+# My Contributions
+Conceptualized the idea -- designed the exoplanet detection platform, orbital visualization, and UI direction
+Debugged constant integration issues -- idnetified API errors, performance problems, button logic
+Deployed to production — set up using Render, tested (a lot), handled feedback and broken iterations.
+
+# Tech Stack
+Frontend: HTML, JavaScript, Tailwind CSS, Chart.js
+Backend: Python, FastAPI
+External APIs: TESS lightcurve data, Groq AI
+Hosting: Render
+AI assistance: Google Gemini (initial coding and core structure), Claude (debugging/fixes/polishing)
+
+# How To Use
+Visit the live service at :  
+Launch Mission Control
+Type in Star TIC ID of your choice
+Initialze BLS Scan
+and if you do not understand the graph/metrics just ask the AI Chatbo on the side panel.
+
+# What I learned : patience is key and that there are no shortcuts in life (I'm serious).
+
+
+

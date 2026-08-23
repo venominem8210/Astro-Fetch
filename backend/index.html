@@ -8,7 +8,6 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.tailwindcss.com">
-    </link>
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;600;700&display=swap"
         rel="stylesheet">
@@ -384,7 +383,37 @@
                 }
             });
         }
-        // ADD THIS FUNCTION TO YOUR app.js (or wherever renderChart is defined)
+        const knownStarDistances = {
+
+            "25155310": "344.0 ly",
+            "422756130": "146.7 ly",
+            "150428135": "101.4 ly",
+            "260355601": "1300.0 ly",
+            "199468207": "236.7 ly",
+            "420112587": "99.0 ly",
+            "198485881": "188.8 ly",
+            "33565113": "741.0 ly",
+            "101011575": "103.0 ly",
+            "467179528": "118.3 ly",
+            "229005374": "429.0 ly",
+            "372172128": "861.0 ly",
+            "142937186": "93.1 ly",
+            "272449080": "214.2 ly",
+            "159871932": "245.5 ly",
+            "259642456": "122.4 ly",
+            "419411415": "283.0 ly",
+            "358467049": "310.8 ly",
+            "231663901": "156.1 ly",
+            "441462002": "342.6 ly",
+
+            "283181822": "160000.0 ly",
+            "283832729": "160000.0 ly",
+            "283088219": "160000.0 ly",
+            "268393527": "200000.0 ly",
+            "283111451": "163000.0 ly"
+        };
+
+
 
         function renderOrbitalSystem(data) {
             /**
@@ -495,7 +524,7 @@
                     <span style="color: #00ff87;">⚡ Transit Depth:</span> ${parseFloat(data.transit_depth_pct || 0).toFixed(2)}%
                 </div>
                 <div style="grid-column: 1 / -1;">
-                    <span style="color: #f0f0f0;">📍 Distance from Earth:</span> <span style="color: #f5c400;">${data.distance_lightyears || 'Data unavailable'}</span> lightyears
+                    <span style="color: #f0f0f0;">📍 Distance from Earth:</span> <span style="color: #f5c400;">${knownStarDistances[data.target] || 'Distance data unavailable'}</span> lightyears
                 </div>
             </div>
         `;
