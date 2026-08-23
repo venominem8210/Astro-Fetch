@@ -7,15 +7,18 @@ AstroFetch-Voyager X is an exoplanet detection platform that uses star light cur
 
 # Features
 Features a Light Curve Graph depicting the normalized flux of light from the specified star.
+
 Uses that data to anaylze and depict a rough model of how the planet and the star compare in size to each other.
+
 Also consists of real-time metrics - eg. planet radius, distance from Earth, etc.
+
 Voyager-X features an AI Chatbot as well to explain the planetary characteristics and generates a simple story to make it easier to understand.
 
 # How It Works
-User enters Star TIC ID 
-System fetches TESS lightcurve data
-Displays graph of transit data
-AI then analyzes characteristics
+User enters Star TIC ID-
+System fetches TESS lightcurve data -
+Displays graph of transit data -
+AI then analyzes characteristics to answer questions. -
 Shows orbital system visualization with key metrics.
 
 # My Contributions
@@ -27,9 +30,13 @@ Deployed to production — set up using Render, tested (a lot), handled feedback
 
 # Tech Stack
 Frontend: HTML, JavaScript, Tailwind CSS, Chart.js
+
 Backend: Python, FastAPI
+
 External APIs: TESS lightcurve data, Groq AI
+
 Hosting: Render
+
 AI assistance: Google Gemini (initial coding and core structure), Claude (debugging/fixes/polishing)
 
 # How To Use
@@ -37,7 +44,8 @@ Visit the live service at :
 Launch Mission Control
 Type in Star TIC ID of your choice
 Initialze BLS Scan
-and if you do not understand the graph/metrics just ask the AI Chatbo on the side panel.
+
+and if you do not understand the graph/metrics just ask the AI Chatbot on the side panel.
 
 # What I learned : patience is key and that there are no shortcuts in life (I'm serious).
 
