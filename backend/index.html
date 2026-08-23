@@ -7,6 +7,11 @@
     <title>VOYAGER-X // Exoplanet Hunter</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.tailwindcss.com">
+    </link>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
     <!-- Chart.js CDN for Light Curve Plotting -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -126,6 +131,8 @@
                 <div class="relative w-full flex-1 min-h-[350px]">
                     <canvas id="lightCurveChart"></canvas>
                 </div>
+                <div id="orbital-system"></div>
+                <div id="orbital-characteristics"></div>
             </div>
         </div>
 
@@ -208,6 +215,7 @@
                 document.getElementById('target-badge').innerText = `Target: ${currentTargetData.target}`;
 
                 renderChart(currentTargetData.time, currentTargetData.flux);
+                renderOrbitalSystem(currentTargetData)
 
             } catch (err) {
                 logMessage(`CRITICAL ERROR: ${err.message}`);
@@ -376,6 +384,127 @@
                 }
             });
         }
+        // ADD THIS FUNCTION TO YOUR app.js (or wherever renderChart is defined)
+
+        function renderOrbitalSystem(data) {
+            /**
+             * Render a static 2D orbital visualization showing star + planet
+             * Display: planet radius, temperature, transit depth, distance from Earth
+             */
+
+            const container = document.getElementById('orbital-system');
+            if (!container) return;
+
+            const width = container.clientWidth;
+            const height = 400;
+
+            // Clear previous
+            container.innerHTML = '';
+
+            // Create SVG
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', width);
+            svg.setAttribute('height', height);
+            svg.setAttribute('style', 'background: #0a0e27; border-radius: 8px; margin-top: 1.5rem;');
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Star radius (scaled for visibility)
+            const starRadiusSolar = parseFloat(data.star_radius_solar) || 1.0;
+            const starRadius = Math.max(15, starRadiusSolar * 8);  // scale for visibility
+
+            // Planet radius (scaled for visibility)
+            const planetRadiusEarth = parseFloat(data.planet_radius_earth) || 1.0;
+            const planetRadius = Math.max(6, planetRadiusEarth * 3);
+
+            // Orbital radius (fixed, shows planet is distant)
+            const orbitalRadius = 120;
+
+            // Draw orbital path (dashed circle)
+            const orbitPath = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            orbitPath.setAttribute('cx', centerX);
+            orbitPath.setAttribute('cy', centerY);
+            orbitPath.setAttribute('r', orbitalRadius);
+            orbitPath.setAttribute('fill', 'none');
+            orbitPath.setAttribute('stroke', '#3a4a6a');
+            orbitPath.setAttribute('stroke-dasharray', '4,4');
+            orbitPath.setAttribute('stroke-width', '1');
+            svg.appendChild(orbitPath);
+
+            // Draw star (center)
+            const star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            star.setAttribute('cx', centerX);
+            star.setAttribute('cy', centerY);
+            star.setAttribute('r', starRadius);
+            star.setAttribute('fill', '#f5c400');
+            star.setAttribute('filter', 'drop-shadow(0 0 8px #f5c40080)');
+            svg.appendChild(star);
+
+            // Draw planet (positioned on right side of orbit)
+            const planetX = centerX + orbitalRadius;
+            const planetY = centerY;
+
+            const planet = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            planet.setAttribute('cx', planetX);
+            planet.setAttribute('cy', planetY);
+            planet.setAttribute('r', planetRadius);
+            planet.setAttribute('fill', '#4a90e2');
+            planet.setAttribute('filter', 'drop-shadow(0 0 6px #4a90e280)');
+            svg.appendChild(planet);
+
+            // Star label
+            const starLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            starLabel.setAttribute('x', centerX);
+            starLabel.setAttribute('y', centerY + starRadius + 20);
+            starLabel.setAttribute('text-anchor', 'middle');
+            starLabel.setAttribute('fill', '#f5c400');
+            starLabel.setAttribute('font-size', '12px');
+            starLabel.setAttribute('font-family', 'monospace');
+            starLabel.textContent = 'STAR';
+            svg.appendChild(starLabel);
+
+            // Planet label
+            const planetLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            planetLabel.setAttribute('x', planetX);
+            planetLabel.setAttribute('y', planetY - planetRadius - 10);
+            planetLabel.setAttribute('text-anchor', 'middle');
+            planetLabel.setAttribute('fill', '#4a90e2');
+            planetLabel.setAttribute('font-size', '12px');
+            planetLabel.setAttribute('font-family', 'monospace');
+            planetLabel.textContent = data.target || 'PLANET';
+            svg.appendChild(planetLabel);
+
+            container.appendChild(svg);
+
+            // Render characteristics below the diagram
+            const charContainer = document.getElementById('orbital-characteristics');
+            if (charContainer) {
+                charContainer.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; font-family: monospace; font-size: 12px; color: #c0c0e0;">
+                <div>
+                    <span style="color: #f5c400;">★ Star Radius:</span> ${starRadiusSolar.toFixed(2)} R☉
+                </div>
+                <div>
+                    <span style="color: #4a90e2;">◉ Planet Radius:</span> ${planetRadiusEarth.toFixed(2)} R⊕
+                </div>
+                <div>
+                    <span style="color: #4a90e2;">♨ Equilibrium Temp:</span> ${Math.round(parseFloat(data.equilibrium_temp_k))}K
+                </div>
+                <div>
+                    <span style="color: #00ff87;">⚡ Transit Depth:</span> ${parseFloat(data.transit_depth_pct || 0).toFixed(2)}%
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <span style="color: #f0f0f0;">📍 Distance from Earth:</span> <span style="color: #f5c400;">${data.distance_lightyears || 'Data unavailable'}</span> lightyears
+                </div>
+            </div>
+        `;
+            }
+        }
+
+        // CALL THIS after you fetch lightcurve data
+        // Add to your renderChart() function or wherever you process lightcurve data:
+        // renderOrbitalSystem(currentTargetData);
 
     </script>
 </body>
