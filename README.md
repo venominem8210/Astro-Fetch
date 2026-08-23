@@ -24,7 +24,7 @@ Shows orbital system visualization with key metrics.
 # My Contributions
 Conceptualized the idea -- designed the exoplanet detection platform, orbital visualization, and UI direction
 
-Debugged constant integration issues -- idnetified API errors, performance problems, button logic
+Debugged constant integration issues -- identified API errors, performance problems, button logic
 
 Deployed to production — set up using Render, tested (a lot), handled feedback and broken iterations.
 
@@ -33,19 +33,20 @@ Frontend: HTML, JavaScript, Tailwind CSS, Chart.js
 
 Backend: Python, FastAPI
 
-External APIs: TESS lightcurve data, Groq AI
+External APIs: TESS light curve data, Groq AI
 
 Hosting: Render
 
 AI assistance: Google Gemini (initial coding and core structure), Claude (debugging/fixes/polishing)
 
 # How To Use
-Visit the live service at :  
-Launch Mission Control
-Type in Star TIC ID of your choice
-Initialze BLS Scan
+Visit the live service at :  https://voyager-x-5aug.onrender.com/
 
-and if you do not understand the graph/metrics just ask the AI Chatbot on the side panel.
+Launch Mission Control -
+Type in Star TIC ID of your choice -
+Initialize BLS Scan -- and you are set.  
+
+if you do not understand the graph/metrics just ask the AI Chatbot on the side panel.
 
 # What I learned : patience is key and that there are no shortcuts in life (I'm serious).
 
