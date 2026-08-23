@@ -20,7 +20,9 @@ Shows orbital system visualization with key metrics.
 
 # My Contributions
 Conceptualized the idea -- designed the exoplanet detection platform, orbital visualization, and UI direction
+
 Debugged constant integration issues -- idnetified API errors, performance problems, button logic
+
 Deployed to production — set up using Render, tested (a lot), handled feedback and broken iterations.
 
 # Tech Stack
